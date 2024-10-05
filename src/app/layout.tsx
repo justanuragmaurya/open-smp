@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import GridPattern from "@/components/ui/grid-pattern";
 import { cn } from "@/lib/utils";
+import { Providers } from "@/components/provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,17 +20,11 @@ export default function RootLayout({
       <body
         className={`${""} antialiased`}
       >
-        <Navbar/>
-        {children}
-        <GridPattern
-        width={50}
-        height={50}
-        x={-1}
-        y={-1}
-        className={cn(
-          "[mask-image:linear-gradient(to_bottom_right,white,transparent,transparent)] ",
-        )}
-      />
+        <Providers>
+          <Navbar />
+          {children}
+          <GridPattern width={50} height={50} x={-1} y={-1} className={cn("[mask-image:linear-gradient(to_bottom_right,white,transparent,transparent)] -z-10")}/>
+        </Providers>
       </body>
     </html>
   );
