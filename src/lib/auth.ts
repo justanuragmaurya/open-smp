@@ -1,12 +1,15 @@
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from "next-auth/providers/google";
-import { signIn } from 'next-auth/react';
-import { pages } from 'next/dist/build/templates/app-page';
-export const NEXT_AUTH = {
+import { PrismaClient } from '@prisma/client';
+import { NextAuthOptions } from 'next-auth';
+
+const prisma = new PrismaClient();
+
+export const NEXT_AUTH: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || ""
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -14,34 +17,48 @@ export const NEXT_AUTH = {
         username: { label: 'email', type: 'text', placeholder: '' },
         password: { label: 'password', type: 'password', placeholder: '' },
       },
-      async authorize(credentials: any) {
-        
-        return {
-          id: "user1",
-          name: "asd",
-          email:"anurag@mail.com"
-        };
+      async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) {
+          return null;
+        }
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.username
+          }
+        });
+
+        if (user && user.password === credentials.password) { // In a real app, use proper password hashing
+          return {
+            id: user.id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            image: user.image,
+          };
+        }
+
+        return null;
       },
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    jwt: async ({ user, token }: any) => {
+    async jwt({ token, user }) {
       if (user) {
         token.uid = user.id;
-        token.role = user.role
       }
       return token;
     },
-    session: ({ session, token, user }: any) => {
+    async session({ session, token }:any) {
       if (session.user) {
-        session.user.id = token.uid
-        session.user.role = token.role
+        session.user.id = token.uid;
+        session.user.role = token.role;
       }
-      return session
+      return session;
     }
   },
-  pages:{
-    signIn:"/signin"
+  secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: "/signin"
   }
-}
+};

@@ -55,13 +55,19 @@ export default function Signup() {
             <Input id="password" type="password" onChange={(e)=>{setPass(e.target.value)}} required />
           </div>
           <Button className="w-full" onClick={async()=>{
-            const res = await signIn("credentials",{
-              username:"",
-              password:"",
-              redirect:false
+            const res = await signIn("credentials", {
+              username: email,
+              password: password,
+              redirect: false
             })
             console.log(res);
-            router.push("/")
+            if (res?.ok) {
+              router.push("/")
+            } else {
+              // Handle error, e.g., show an error message
+              alert("Invalid email or password")
+              console.error("Sign in failed:", res?.error);
+            }
           }}>
             Login
           </Button>
