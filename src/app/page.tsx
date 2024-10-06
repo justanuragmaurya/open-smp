@@ -1,17 +1,20 @@
 import AnimatedGradientText from "@/components/ui/animated-gradient-text";
 import { Button } from "@/components/ui/button";
+import { NEXT_AUTH } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 import { getServerSession } from "next-auth"
 
 
 async function getUser() {
-  const session = await getServerSession();
+  const session = await getServerSession(NEXT_AUTH);
   return session;
 }
 
 export default async function Home() {
+  
   const session = await getUser();
+
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="flex items-center justify-center w-full min-h-[calc(100vh-64px)]">
