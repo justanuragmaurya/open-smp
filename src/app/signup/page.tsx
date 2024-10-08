@@ -10,11 +10,33 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useState } from "react"
+
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
 export const description =
   "A sign up form with first name, last name, email and password inside a card. There's an option to sign up with GitHub and a link to login if you already have an account"
 
 export default function LoginForm() {
+  const [fname,setfname] = useState();
+  const [lname,setlname] = useState();
+  const [email,setemail] = useState();
+  const [password,setpass] = useState();
+
+  const handleSubmit = async(e:any) => {
+    e.preventDefault();
+    const user = await prisma.user.create({
+      data: {
+        email|,
+        firstName,
+        lastName,
+        password, // Note: In a real application, you should hash the password before storing it
+        role: "USER",
+      }
+    });
+  }
+  
   return (
     <div className="flex items-center justify-center h-screen">
       <Card className="mx-auto max-w-sm">
@@ -49,7 +71,7 @@ export default function LoginForm() {
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" />
             </div>
-            <Button type="submit" className="w-full">
+            <Button onClick={handleSubmit} className="w-full">
               Create an account
             </Button>
 
